@@ -1,0 +1,6 @@
+framework module Pods_MoviesJPUITests {
+  umbrella header "Pods-MoviesJPUITests-umbrella.h"
+
+  export *
+  module * { export * }
+}
