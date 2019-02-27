@@ -8,7 +8,6 @@
 
 import Foundation
 import Alamofire
-import SwiftyJSON
 
 func newJSONDecoder() -> JSONDecoder {
     let decoder = JSONDecoder()

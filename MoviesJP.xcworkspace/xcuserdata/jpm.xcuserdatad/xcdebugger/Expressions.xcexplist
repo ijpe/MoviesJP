@@ -18,5 +18,13 @@
             </PersistentString>
          </PersistentStrings>
       </ContextState>
+      <ContextState
+         contextName = "MovieCategoryViewController.tableView(_:willDisplay:forRowAt:):MovieCategoryViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "self.fetchedResults?.fetchedObjects!.count">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
    </ContextStates>
 </VariablesViewState>

@@ -21,7 +21,7 @@
                                 <rect key="frame" x="0.0" y="20" width="375" height="580"/>
                                 <subviews>
                                     <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="equalSpacing" spacing="10" translatesAutoresizingMaskIntoConstraints="NO" id="xs2-rM-Uwd">
-                                        <rect key="frame" x="20" y="30" width="335" height="243"/>
+                                        <rect key="frame" x="20" y="30" width="335" height="253"/>
                                         <subviews>
                                             <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="eDl-IA-stu">
                                                 <rect key="frame" x="0.0" y="0.0" width="335" height="100"/>
@@ -99,9 +99,14 @@
                                                     </label>
                                                 </subviews>
                                             </stackView>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dAk-R7-6rw">
-                                                <rect key="frame" x="0.0" y="213" width="335" height="30"/>
-                                                <state key="normal" title="Show trailer"/>
+                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="dAk-R7-6rw">
+                                                <rect key="frame" x="0.0" y="213" width="335" height="40"/>
+                                                <constraints>
+                                                    <constraint firstAttribute="height" constant="40" id="q2y-OF-tg2"/>
+                                                </constraints>
+                                                <state key="normal" title="Show movie video" image="outline_videocam_black_24pt">
+                                                    <color key="titleColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                                </state>
                                                 <connections>
                                                     <action selector="playVideo" destination="q66-KH-jBN" eventType="touchUpInside" id="XTx-D5-PE8"/>
                                                 </connections>
@@ -131,6 +136,7 @@
                     </view>
                     <size key="freeformSize" width="375" height="600"/>
                     <connections>
+                        <outlet property="btnVideo" destination="dAk-R7-6rw" id="TVi-ZY-i1f"/>
                         <outlet property="img" destination="BTu-Ir-8nA" id="CAM-LP-BNl"/>
                         <outlet property="lblOverview" destination="y7m-qN-J6X" id="3qb-kS-yKN"/>
                         <outlet property="lblReleaseDate" destination="eSp-ac-I8M" id="SVJ-W1-d9y"/>
@@ -161,38 +167,8 @@
             </objects>
             <point key="canvasLocation" x="214" y="184"/>
         </scene>
-        <!--Web Site View Controller-->
-        <scene sceneID="sCS-PR-deP">
-            <objects>
-                <viewController storyboardIdentifier="webSiteVC" id="3kV-Nb-4Eh" customClass="WebSiteViewController" customModule="MoviesJP" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="WeS-Eq-Bbi">
-                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="u6h-Aw-Jl1">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
-                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
-                        </subviews>
-                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <constraints>
-                            <constraint firstAttribute="trailing" secondItem="u6h-Aw-Jl1" secondAttribute="trailing" id="Esl-Pp-3hN"/>
-                            <constraint firstItem="u6h-Aw-Jl1" firstAttribute="leading" secondItem="WeS-Eq-Bbi" secondAttribute="leading" id="LUW-EH-Ac0"/>
-                            <constraint firstItem="u6h-Aw-Jl1" firstAttribute="top" secondItem="WeS-Eq-Bbi" secondAttribute="top" id="X1S-mE-6I9"/>
-                            <constraint firstAttribute="bottom" secondItem="u6h-Aw-Jl1" secondAttribute="bottom" id="xTQ-8X-kBh"/>
-                        </constraints>
-                    </view>
-                    <connections>
-                        <outlet property="webView" destination="u6h-Aw-Jl1" id="z8B-O0-Pgo"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="jZE-As-zOZ" userLabel="First Responder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1086" y="214"/>
-        </scene>
     </scenes>
+    <resources>
+        <image name="outline_videocam_black_24pt" width="48" height="48"/>
+    </resources>
 </document>

@@ -9,7 +9,6 @@
 import Foundation
 import UIKit
 import MXParallaxHeader
-import KVNProgress
 
 //MARK: - MovieViewController
 class MovieViewController: UIViewController {
@@ -19,7 +18,8 @@ class MovieViewController: UIViewController {
     var popular: PopularMovie!
     var topRated: TopRatedMovie!
     var upcoming: UpcomingMovie!
-    var videoUrl: String! = "https://www.youtube.com/watch?v=huxHcFvd5PQ"
+    var searched: SearchMovie!
+    var videoUrl: String!
     
     @IBOutlet var scrollView: MXScrollView!
     @IBOutlet var viewParallax: UIView!
@@ -29,26 +29,31 @@ class MovieViewController: UIViewController {
     @IBOutlet var lblUserScore: UILabel!
     @IBOutlet var lblOverview: UILabel!
     @IBOutlet var webSiteContainer: UIView!
+    @IBOutlet var btnVideo: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        self.btnVideo.isHidden = true
         
         switch self.typeId {
         case 1:
             self.showPopular()
         case 2:
             self.showTopRated()
-        default:
+        case 3:
             self.showUpcoming()
+        default:
+            self.showSearched()
         }
         
         scrollView.parallaxHeader.view = self.viewParallax
-        scrollView.parallaxHeader.height = 600
+        scrollView.parallaxHeader.height = 500
         scrollView.parallaxHeader.mode = MXParallaxHeaderMode.fill
     }
     
     //MARK: Functions
-    func showPopular() {
+    private func showPopular() {
         self.title = popular.title
         self.lblTitle.text = popular.title
         self.lblReleaseDate.text = popular.releaseDate
@@ -56,12 +61,12 @@ class MovieViewController: UIViewController {
         self.lblOverview.text = popular.overview
         self.img.sd_setImage(with: URL(string: "\(Env.MoviesApi.baseImageLargePath)\(popular.posterPath!)"))
         
-//        if popular.video {
+        if popular.video {
             self.getVideosFor(movieId: Int(popular.id))
-//        }
+        }
     }
     
-    func showTopRated() {
+    private func showTopRated() {
         self.title = topRated.title
         self.lblTitle.text = topRated.title
         self.lblReleaseDate.text = topRated.releaseDate
@@ -74,7 +79,7 @@ class MovieViewController: UIViewController {
         }
     }
     
-    func showUpcoming() {
+    private func showUpcoming() {
         self.title = upcoming.title
         self.lblTitle.text = upcoming.title
         self.lblReleaseDate.text = upcoming.releaseDate
@@ -87,30 +92,44 @@ class MovieViewController: UIViewController {
         }
     }
     
-    func getVideosFor(movieId: Int) {
+    private func showSearched() {
+        self.title = searched.title
+        self.lblTitle.text = searched.title
+        self.lblReleaseDate.text = searched.releaseDate
+        self.lblUserScore.text = "\(searched.voteAverage)"
+        self.lblOverview.text = searched.overview
+        self.img.sd_setImage(with: URL(string: "\(Env.MoviesApi.baseImageLargePath)\(searched.posterPath!)"))
         
-        KVNProgress.show(withStatus: "Loading...")
-
+        if searched.video {
+            self.getVideosFor(movieId: Int(searched.id))
+        } else {
+            self.videoUrl = "https://www.youtube.com/watch?v=huxHcFvd5PQ"
+            self.btnVideo.setTitle("Video for demostrable purpose", for: .normal)
+            self.btnVideo.isHidden = false
+        }
+    }
+    
+    private func getVideosFor(movieId: Int) {
+        
         MoviesAPI().loadVideos(movieId: movieId) { (videoResponse, error) in
 
             if let videoResponse = videoResponse {
 
                 for video in videoResponse.results {
                     self.videoUrl = "https://www.youtube.com/watch?v=\(video.key!)"
+                    self.btnVideo.isHidden = false
                 }
-
-                KVNProgress.dismiss()
             } else {
-                KVNProgress.showError(withStatus: error?.localizedDescription)
+                print(error?.localizedDescription)
             }
         }
     }
     
     //MARK: Action
     @IBAction func playVideo() {
-        let controller = self.storyboard!.instantiateViewController(withIdentifier: "webSiteVC") as! WebSiteViewController
-        controller.url = self.videoUrl
-        controller.view.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(controller.view)
+        let wsVC = UIStoryboard(name: "WebSite", bundle: nil).instantiateInitialViewController() as! WebSiteViewController
+        wsVC.url = self.videoUrl
+//        wsVC.view.translatesAutoresizingMaskIntoConstraints = false
+        self.show(wsVC, sender: nil)
     }
 }

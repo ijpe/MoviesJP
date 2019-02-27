@@ -14,11 +14,13 @@ class MoviesAPI {
     typealias MoviesTopRatedHandler = (TopRatedResponse?, Error?) -> Void
     typealias MoviesUpcomingHandler = (UpcomingResponse?, Error?) -> Void
     typealias MovieVideoHandler = (MovieVideoResponse?, Error?) -> Void
+    typealias MovieSearchHandler = (MovieSearchResponse?, Error?) -> Void
     
-    func loadPopular(completion: @escaping MoviesPopularHandler) {
+    func loadPopular(page: Int, completion: @escaping MoviesPopularHandler) {
         
         var _parameters = [String : Any]()
         _parameters["api_key"] = Env.MoviesApi.ApiKey
+        _parameters["page"] = page
         
         Alamofire.request("\(Env.MoviesApi.basePath)/movie/popular", method: .get, parameters: _parameters).responsePopular { (response) in
             if let response = response.result.value {
@@ -29,10 +31,11 @@ class MoviesAPI {
         }
     }
     
-    func loadTopRated(completion: @escaping MoviesTopRatedHandler) {
+    func loadTopRated(page: Int, completion: @escaping MoviesTopRatedHandler) {
         
         var _parameters = [String : Any]()
         _parameters["api_key"] = Env.MoviesApi.ApiKey
+        _parameters["page"] = page
         
         Alamofire.request("\(Env.MoviesApi.basePath)/movie/popular", method: .get, parameters: _parameters).responseTopRated { (response) in
             if let response = response.result.value {
@@ -43,10 +46,11 @@ class MoviesAPI {
         }
     }
     
-    func loadUpcoming(completion: @escaping MoviesUpcomingHandler) {
+    func loadUpcoming(page: Int, completion: @escaping MoviesUpcomingHandler) {
         
         var _parameters = [String : Any]()
         _parameters["api_key"] = Env.MoviesApi.ApiKey
+        _parameters["page"] = page
         
         Alamofire.request("\(Env.MoviesApi.basePath)/movie/popular", method: .get, parameters: _parameters).responseUpcoming { (response) in
             if let response = response.result.value {
@@ -70,23 +74,19 @@ class MoviesAPI {
             }
         }
     }
-}
-
-extension DataRequest {
-    @discardableResult
-    func responsePopular(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<PopularResponse>) -> Void) -> Self {
-        return responseDecodable(queue: queue, completionHandler: completionHandler)
-    }
     
-    func responseTopRated(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<TopRatedResponse>) -> Void) -> Self {
-        return responseDecodable(queue: queue, completionHandler: completionHandler)
-    }
-    
-    func responseUpcoming(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<UpcomingResponse>) -> Void) -> Self {
-        return responseDecodable(queue: queue, completionHandler: completionHandler)
-    }
-    
-    func responseVideos(queue: DispatchQueue? = nil, completionHandler: @escaping (DataResponse<MovieVideoResponse>) -> Void) -> Self {
-        return responseDecodable(queue: queue, completionHandler: completionHandler)
+    func searchMovieBy(query: String, completion: @escaping MovieSearchHandler) {
+        
+        var _parameters = [String : Any]()
+        _parameters["api_key"] = Env.MoviesApi.ApiKey
+        _parameters["query"] = query
+        
+        Alamofire.request("\(Env.MoviesApi.basePath)/search/movie", method: .get, parameters: _parameters).responseSearch { (response) in
+            if let response = response.result.value {
+                completion(response, nil)
+            } else {
+                completion(nil, response.error)
+            }
+        }
     }
 }

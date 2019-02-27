@@ -15,9 +15,9 @@ class MoviesTabBarController: UITabBarController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        let popularC = MovieCategory(typeId: 1, title: "Popular", entityName: "PopularMovie")
-        let topRatedC = MovieCategory(typeId: 2, title: "Top Rated", entityName: "TopRatedMovie")
-        let upcomingC = MovieCategory(typeId: 3, title: "Upcoming", entityName: "UpcomingMovie")
+        let popularC = MovieCategory(typeId: 1, title: "Popular", entityName: "PopularMovie", sortBy: "popularity", ascending: false)
+        let topRatedC = MovieCategory(typeId: 2, title: "Top Rated", entityName: "TopRatedMovie", sortBy: "voteAverage", ascending: false)
+        let upcomingC = MovieCategory(typeId: 3, title: "Upcoming", entityName: "UpcomingMovie", sortBy: "releaseDate", ascending: true)
         
         let storyboard = UIStoryboard(name: "MovieCategory", bundle: nil)
         
@@ -29,12 +29,14 @@ class MoviesTabBarController: UITabBarController {
         upcomingVC.movieCategory = upcomingC
         
         let ncPopular = UINavigationController.init(rootViewController: popularVC)
-        ncPopular.tabBarItem = UITabBarItem(title: popularC.title, image: nil, selectedImage: nil)
+        ncPopular.tabBarItem = UITabBarItem(title: popularC.title, image: UIImage(named: "outline_favorite_border_black_24pt"), selectedImage: nil)
         let ncTopRated = UINavigationController.init(rootViewController: topRatedVC)
-        ncTopRated.tabBarItem = UITabBarItem(title: topRatedC.title, image: nil, selectedImage: nil)
+        ncTopRated.tabBarItem = UITabBarItem(title: topRatedC.title, image: UIImage(named: "outline_grade_black_24pt"), selectedImage: nil)
         let ncUpcoming = UINavigationController.init(rootViewController: upcomingVC)
-        ncUpcoming.tabBarItem = UITabBarItem(title: upcomingC.title, image: nil, selectedImage: nil)
+        ncUpcoming.tabBarItem = UITabBarItem(title: upcomingC.title, image: UIImage(named: "outline_date_range_black_24pt"), selectedImage: nil)
+        let ncSearch = UIStoryboard(name: "MovieSearch", bundle: nil).instantiateInitialViewController()!
+        ncSearch.tabBarItem = UITabBarItem(title: "Search", image: UIImage(named: "outline_search_black_24pt"), selectedImage: nil)
         
-        self.viewControllers = [ncPopular, ncTopRated, ncUpcoming]
+        self.viewControllers = [ncPopular, ncTopRated, ncUpcoming, ncSearch]
     }
 }

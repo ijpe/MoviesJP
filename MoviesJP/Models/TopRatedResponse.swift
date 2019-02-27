@@ -8,6 +8,7 @@
 
 import Foundation
 
+//MARK: - TopRatedResponse
 class TopRatedResponse: Codable {
     let page: Int?
     let results: [MTopRated]
@@ -27,5 +28,6 @@ class TopRatedResponse: Codable {
     }
 }
 
+//MARK: - MTopRated
 class MTopRated: Movie {
 }

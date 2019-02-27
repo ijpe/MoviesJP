@@ -8,6 +8,7 @@
 
 import Foundation
 
+//MARK: - UpcomingResponse
 class UpcomingResponse: Codable {
     let page: Int?
     let results: [MUpcoming]
@@ -27,5 +28,6 @@ class UpcomingResponse: Codable {
     }
 }
 
+//MARK: - MUpcoming
 class MUpcoming: Movie {
 }

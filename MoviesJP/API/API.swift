@@ -9,7 +9,5 @@
 import Foundation
 
 class API {
-    
-    
     static let movies: MoviesAPI = { return MoviesAPI() }()
 }

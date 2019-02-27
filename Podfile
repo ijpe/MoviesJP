@@ -6,11 +6,12 @@ target 'MoviesJP' do
   use_frameworks!
 
   # Pods for MoviesJP
-  pod 'KVNProgress'
-  pod 'SwiftyJSON', '~> 4.0'
+  #pod 'KVNProgress'
+  #pod 'SwiftyJSON', '~> 4.0'
   pod 'Alamofire', '~> 4.7'
   pod 'SDWebImage', '~> 4.0'
   pod "MXParallaxHeader"
+  pod 'AlamofireNetworkActivityIndicator', '~> 2.2'
 
   target 'MoviesJPTests' do
     inherit! :search_paths

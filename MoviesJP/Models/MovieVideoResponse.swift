@@ -8,6 +8,7 @@
 
 import Foundation
 
+//MARK: - MovieVideoResponse
 class MovieVideoResponse: Codable {
     let id: Int?
     let results: [MVideo]
@@ -18,6 +19,7 @@ class MovieVideoResponse: Codable {
     }
 }
 
+//MARK: - MVideo
 class MVideo: Codable {
     let id, iso639_1, iso3166_1, key: String?
     let name, site: String?

@@ -8,6 +8,7 @@
 
 import Foundation
 
+//MARK: - PopularResponse
 class PopularResponse: Codable {
     let page: Int?
     let results: [MPopular]
@@ -27,5 +28,6 @@ class PopularResponse: Codable {
     }
 }
 
+//MARK: - MPopular
 class MPopular: Movie {
 }

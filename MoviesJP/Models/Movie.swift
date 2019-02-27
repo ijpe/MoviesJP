@@ -8,6 +8,7 @@
 
 import Foundation
 
+//MARK: - Movie
 class Movie: Codable {
     var posterPath: String?
     var adult: Bool?
@@ -38,7 +39,7 @@ class Movie: Codable {
         case voteAverage = "vote_average"
     }
     
-    // MARK: - Decodable
+    // MARK: Decodable
     required init(from decoder: Decoder) throws {
         let container = try decoder.container(keyedBy: CodingKeys.self)
         self.posterPath = try container.decode(String.self, forKey: .posterPath)
@@ -57,7 +58,7 @@ class Movie: Codable {
         self.voteAverage = try container.decodeIfPresent(Double.self, forKey: .voteAverage)!
     }
     
-    // MARK: - Encodable
+    // MARK: Encodable
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(self.posterPath, forKey: .posterPath)

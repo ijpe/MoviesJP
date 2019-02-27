@@ -9,17 +9,18 @@
 import Foundation
 import UIKit
 import Alamofire
-import KVNProgress
 import CoreData
 import SDWebImage
 
 //MARK: MovieCategoryViewController
-class MovieCategoryViewController: UIViewController, UITableViewDataSource {
+class MovieCategoryViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    private var page = 0
+    private var totalPage: Int! = nil
+    private let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    private var fetchedResults: NSFetchedResultsController<NSFetchRequestResult>!
+    private let searchController = UISearchController(searchResultsController: nil)
     var movieCategory: MovieCategory!
-    var fetchedResults: NSFetchedResultsController<NSFetchRequestResult>!
-    let searchController = UISearchController(searchResultsController: nil)
     
     @IBOutlet var tblMovies: UITableView!
     
@@ -49,13 +50,15 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
         
         self.title = self.movieCategory.title
         
-        searchController.searchResultsUpdater = self
+        self.searchController.searchResultsUpdater = self
         self.searchController.obscuresBackgroundDuringPresentation = false
-        self.searchController.searchBar.placeholder = "Buscar"
-        navigationItem.searchController = self.searchController
-        definesPresentationContext = true
+        self.searchController.searchBar.placeholder = "Search"
+        self.navigationItem.searchController = self.searchController
+        self.definesPresentationContext = true
         
         self.tblMovies.dataSource = self
+        self.tblMovies.delegate = self
+        
         self.loadMovies()
     }
     
@@ -75,8 +78,14 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
             
             cell.img.sd_setImage(with: URL(string: "\(Env.MoviesApi.baseImageSmallPath)\(m.posterPath!)"))
             cell.lblTitle.text = m.title
-            cell.lblReleaseDate.text = m.releaseDate
+            cell.lblInfo.text = "Popularity: \(m.popularity)"
             cell.lblOverview.text = m.overview
+            
+            if m.video {
+                cell.imgVideo.isHidden = false
+            } else {
+                cell.imgVideo.isHidden = true
+            }
         case 2:
             guard let m = self.fetchedResults?.object(at: indexPath) as? TopRatedMovie else {
                 fatalError("Error get movie")
@@ -84,8 +93,14 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
             
             cell.img.sd_setImage(with: URL(string: "\(Env.MoviesApi.baseImageSmallPath)\(m.posterPath!)"))
             cell.lblTitle.text = m.title
-            cell.lblReleaseDate.text = m.releaseDate
+            cell.lblInfo.text = "Rate: \(m.voteAverage)"
             cell.lblOverview.text = m.overview
+            
+            if m.video {
+                cell.imgVideo.isHidden = false
+            } else {
+                cell.imgVideo.isHidden = true
+            }
         default:
             guard let m = self.fetchedResults?.object(at: indexPath) as? UpcomingMovie else {
                 fatalError("Error get movie")
@@ -93,33 +108,55 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
             
             cell.img.sd_setImage(with: URL(string: "\(Env.MoviesApi.baseImageSmallPath)\(m.posterPath!)"))
             cell.lblTitle.text = m.title
-            cell.lblReleaseDate.text = m.releaseDate
+            cell.lblInfo.text = m.releaseDate
             cell.lblOverview.text = m.overview
+            
+            if m.video {
+                cell.imgVideo.isHidden = false
+            } else {
+                cell.imgVideo.isHidden = true
+            }
         }
         
         cell.tag = indexPath.row
         return cell
     }
     
-    func loadMovies() {
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         
-        switch self.movieCategory.typeId {
-        case 1:
-            self.loadPopular()
-        case 2:
-            self.loadTopRated()
-        default:
-            self.loadUpcoming()
+        if !self.isFiltering() && indexPath.row == (self.fetchedResults?.fetchedObjects!.count)! - 1 {
+            if self.page <= self.totalPage ?? 1 {
+                self.loadMovies()
+            }
         }
     }
     
-    func loadPopular() {
+    //MARK: Functions
+    private func loadMovies() {
         
-        KVNProgress.show(withStatus: "Loading...")
+        if self.page == 0 || self.totalPage != nil {
+            self.page = self.page + 1
+            
+            switch self.movieCategory.typeId {
+            case 1:
+                self.loadPopular()
+            case 2:
+                self.loadTopRated()
+            default:
+                self.loadUpcoming()
+            }
+        }
+    }
+    
+    private func loadPopular() {
         
-        MoviesAPI().loadPopular { (movieResponse, error) in
+        MoviesAPI().loadPopular(page: self.page) { (movieResponse, error) in
             if let movieResponse = movieResponse {
-                self.truncateEntity(entityName: self.movieCategory.entityName)
+                
+                if self.totalPage == nil {
+                    self.truncateEntity(entityName: self.movieCategory.entityName)
+                    self.totalPage = movieResponse.totalPages
+                }
                 
                 for movie in movieResponse.results {
                     let entity = NSEntityDescription.entity(forEntityName: self.movieCategory.entityName, in: self.context)
@@ -127,7 +164,6 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
                     
                     m.setValue(movie.adult, forKey: "adult")
                     m.setValue(movie.backdropPath, forKey: "backdropPath")
-//                    m.setValue(movie.genreIDS, forKey: "genreIDS")
                     m.setValue(movie.id, forKey: "id")
                     m.setValue(movie.originalLanguage, forKey: "originalLanguage")
                     m.setValue(movie.originalTitle, forKey: "originalTitle")
@@ -142,29 +178,29 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
                 }
                 
                 self.fetchEntity()
-                KVNProgress.dismiss()
             } else {
-                KVNProgress.showError(withStatus: error?.localizedDescription)
+                print(error?.localizedDescription as Any)
             }
         }
     }
     
-    func loadTopRated() {
+    private func loadTopRated() {
         
-        KVNProgress.show(withStatus: "Loading...")
-        
-        MoviesAPI().loadTopRated { (movieResponse, error) in
-            self.truncateEntity(entityName: self.movieCategory.entityName)
+        MoviesAPI().loadTopRated(page: self.page) { (movieResponse, error) in
             
             if let movieResponse = movieResponse {
                 
+                if self.page == 1 {
+                    self.truncateEntity(entityName: self.movieCategory.entityName)
+                    self.totalPage = movieResponse.totalPages
+                }
+                
                 for movie in movieResponse.results {
                     let entity = NSEntityDescription.entity(forEntityName: self.movieCategory.entityName, in: self.context)
                     let m = NSManagedObject(entity: entity!, insertInto: self.context)
                     
                     m.setValue(movie.adult, forKey: "adult")
                     m.setValue(movie.backdropPath, forKey: "backdropPath")
-//                    m.setValue(movie.genreIDS, forKey: "genreIDS")
                     m.setValue(movie.id, forKey: "id")
                     m.setValue(movie.originalLanguage, forKey: "originalLanguage")
                     m.setValue(movie.originalTitle, forKey: "originalTitle")
@@ -179,29 +215,29 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
                 }
                 
                 self.fetchEntity()
-                KVNProgress.dismiss()
             } else {
-                KVNProgress.showError(withStatus: error?.localizedDescription)
+                print(error?.localizedDescription as Any)
             }
         }
     }
     
-    func loadUpcoming() {
+    private func loadUpcoming() {
         
-        KVNProgress.show(withStatus: "Loading...")
-        
-        MoviesAPI().loadUpcoming { (movieResponse, error) in
-            self.truncateEntity(entityName: self.movieCategory.entityName)
+        MoviesAPI().loadUpcoming(page: self.page) { (movieResponse, error) in
             
             if let movieResponse = movieResponse {
                 
+                if self.page == 1 {
+                    self.truncateEntity(entityName: self.movieCategory.entityName)
+                    self.totalPage = movieResponse.totalPages
+                }
+                
                 for movie in movieResponse.results {
                     let entity = NSEntityDescription.entity(forEntityName: self.movieCategory.entityName, in: self.context)
                     let m = NSManagedObject(entity: entity!, insertInto: self.context)
                     
                     m.setValue(movie.adult, forKey: "adult")
                     m.setValue(movie.backdropPath, forKey: "backdropPath")
-//                    m.setValue(movie.genreIDS, forKey: "genreIDS")
                     m.setValue(movie.id, forKey: "id")
                     m.setValue(movie.originalLanguage, forKey: "originalLanguage")
                     m.setValue(movie.originalTitle, forKey: "originalTitle")
@@ -216,19 +252,18 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
                 }
                 
                 self.fetchEntity()
-                KVNProgress.dismiss()
             } else {
-                KVNProgress.showError(withStatus: error?.localizedDescription)
+                print(error?.localizedDescription as Any)
             }
         }
     }
     
-    func fetchEntity() {
+    private func fetchEntity() {
         do {
             try context.save()
             
             let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: self.movieCategory.entityName)
-            fetchRequest.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+            fetchRequest.sortDescriptors = [NSSortDescriptor(key: self.movieCategory.sortBy, ascending: self.movieCategory.ascending)]
             self.fetchedResults = NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: self.context, sectionNameKeyPath: nil, cacheName: nil)
             
             try self.fetchedResults.performFetch()
@@ -239,7 +274,7 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
         }
     }
     
-    func truncateEntity(entityName: String) {
+    private func truncateEntity(entityName: String) {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: entityName)
         let delete = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         do {
@@ -249,15 +284,15 @@ class MovieCategoryViewController: UIViewController, UITableViewDataSource {
         }
     }
     
-    func isFiltering() -> Bool {
+    private func isFiltering() -> Bool {
         return searchController.isActive && !searchBarIsEmpty()
     }
     
-    func searchBarIsEmpty() -> Bool {
+    private func searchBarIsEmpty() -> Bool {
         return searchController.searchBar.text?.isEmpty ?? true
     }
     
-    func filterContentForSearchText(_ searchText: String, scope: String = "All") {
+    private func filterContentForSearchText(_ searchText: String, scope: String = "All") {
         
         var predicate: NSPredicate! = nil
         
