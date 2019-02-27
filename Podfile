@@ -9,6 +9,8 @@ target 'MoviesJP' do
   pod 'KVNProgress'
   pod 'SwiftyJSON', '~> 4.0'
   pod 'Alamofire', '~> 4.7'
+  pod 'SDWebImage', '~> 4.0'
+  pod "MXParallaxHeader"
 
   target 'MoviesJPTests' do
     inherit! :search_paths

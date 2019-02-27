@@ -10,5 +10,13 @@
             </PersistentString>
          </PersistentStrings>
       </ContextState>
+      <ContextState
+         contextName = "MovieCategoryViewController.tableView(_:cellForRowAt:):MovieCategoryViewController.swift">
+         <PersistentStrings>
+            <PersistentString
+               value = "&quot;\(Env.MoviesApi.baseImagePath)\(m.posterPath!)&quot;">
+            </PersistentString>
+         </PersistentStrings>
+      </ContextState>
    </ContextStates>
 </VariablesViewState>

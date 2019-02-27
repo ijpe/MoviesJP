@@ -10,20 +10,20 @@ import Foundation
 
 struct Env {
     struct MoviesApi {
+        static var ApiKey: String {
+            return "972bf0e30a7fadee6e66c29eb4a9f17d"
+        }
         static var host: String {
             return "https://api.themoviedb.org"
         }
         static var basePath: String {
             return "\(host)/3"
         }
-        static var popular: String {
-            return "\(basePath)/movie/popular"
+        static var baseImageSmallPath: String {
+            return "http://image.tmdb.org/t/p/w342"
         }
-        static var topRated: String {
-            return "\(basePath)/movie/top_rated"
-        }
-        static var upcoming: String {
-            return "\(basePath)/movie/upcoming"
+        static var baseImageLargePath: String {
+            return "http://image.tmdb.org/t/p/w780"
         }
     }
 }
